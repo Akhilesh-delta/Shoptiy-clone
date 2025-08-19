@@ -8,63 +8,95 @@ const overlay = document.createElement('div');
 overlay.classList.add('overlay');
 document.body.appendChild(overlay);
 
-// Sample product data
+// Sample product data with more details
 const products = [
     {
         id: 1,
         name: 'Wireless Headphones',
         price: 99.99,
         image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'electronics'
+        category: 'electronics',
+        description: 'Experience crystal clear sound with these premium wireless headphones. Features noise cancellation, 30-hour battery life, and comfortable over-ear design.',
+        rating: 4.5,
+        reviews: 128,
+        inStock: true
     },
     {
         id: 2,
         name: 'Smart Watch',
         price: 199.99,
         image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'electronics'
+        category: 'electronics',
+        description: 'Stay connected with this feature-packed smartwatch. Tracks your fitness, heart rate, sleep, and delivers notifications from your smartphone.',
+        rating: 4.8,
+        reviews: 256,
+        inStock: true
     },
     {
         id: 3,
         name: 'Running Shoes',
         price: 89.99,
         image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'fashion'
+        category: 'fashion',
+        description: 'Lightweight and comfortable running shoes with excellent cushioning and support for all types of runners. Perfect for both training and racing.',
+        rating: 4.7,
+        reviews: 189,
+        inStock: true
     },
     {
         id: 4,
         name: 'Bluetooth Speaker',
         price: 129.99,
         image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'electronics'
+        category: 'electronics',
+        description: 'Portable Bluetooth speaker with 20-hour battery life, waterproof design, and powerful 20W sound. Perfect for outdoor adventures and home use.',
+        rating: 4.6,
+        reviews: 312,
+        inStock: true
     },
     {
         id: 5,
         name: 'Leather Backpack',
         price: 79.99,
         image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'fashion'
+        category: 'fashion',
+        description: 'Stylish and durable leather backpack with multiple compartments, laptop sleeve, and USB charging port. Perfect for work, travel, and everyday use.',
+        rating: 4.9,
+        reviews: 178,
+        inStock: true
     },
     {
         id: 6,
         name: 'Smartphone Stand',
         price: 24.99,
         image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'accessories'
+        category: 'accessories',
+        description: 'Adjustable smartphone stand with 360° rotation and foldable design. Compatible with all smartphones and tablets. Perfect for watching videos and video calls.',
+        rating: 4.3,
+        reviews: 92,
+        inStock: true
     },
     {
         id: 7,
         name: 'Wireless Earbuds',
         price: 149.99,
         image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'electronics'
+        category: 'electronics',
+        description: 'True wireless earbuds with active noise cancellation, 8-hour battery life, and water resistance. Includes charging case for 24+ hours of total playtime.',
+        rating: 4.7,
+        reviews: 421,
+        inStock: true
     },
     {
         id: 8,
         name: 'Fitness Tracker',
         price: 79.99,
         image: 'https://images.unsplash.com/photo-1576243345690-4e4b79a63256?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-        category: 'fitness'
+        category: 'fitness',
+        description: 'Advanced fitness tracker with heart rate monitoring, sleep tracking, and 14-day battery life. Tracks steps, calories, and various workout modes.',
+        rating: 4.5,
+        reviews: 203,
+        inStock: true
     }
 ];
 
@@ -73,23 +105,42 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // Initialize the app
 function init() {
-    displayProducts();
+    displayProducts(products);
     updateCartCount();
     setupEventListeners();
+    
+    // Initialize search and filter
+    setupSearch();
+    setupCategoryFilters();
 }
 
-// Display products on the page
-function displayProducts() {
+// Display products on the page with filtering
+function displayProducts(productsToDisplay) {
     const productGrid = document.getElementById('productGrid');
     productGrid.innerHTML = '';
 
-    products.forEach(product => {
+    if (productsToDisplay.length === 0) {
+        productGrid.innerHTML = '<p class="no-products">No products found. Try adjusting your search or filters.</p>';
+        return;
+    }
+
+    productsToDisplay.forEach(product => {
         const productElement = document.createElement('div');
         productElement.classList.add('product-card');
         productElement.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" class="product-image">
+            <div class="product-image-container">
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <div class="product-actions">
+                    <button class="quick-view" data-id="${product.id}"><i class="fas fa-eye"></i></button>
+                    <button class="add-to-wishlist" data-id="${product.id}"><i class="far fa-heart"></i></button>
+                </div>
+            </div>
             <div class="product-info">
                 <h3 class="product-title">${product.name}</h3>
+                <div class="product-rating">
+                    ${renderRatingStars(product.rating)}
+                    <span class="review-count">(${product.reviews})</span>
+                </div>
                 <span class="product-price">$${product.price.toFixed(2)}</span>
                 <button class="add-to-cart" data-id="${product.id}">Add to Cart</button>
             </div>
@@ -105,6 +156,8 @@ function displayProducts() {
 
 // Add to cart function
 function addToCart(e) {
+    e.stopPropagation(); // Prevent event bubbling
+    
     const productId = parseInt(e.target.dataset.id);
     const product = products.find(p => p.id === productId);
     
@@ -115,8 +168,10 @@ function addToCart(e) {
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
+        // Only include necessary product data in the cart
+        const { id, name, price, image } = product;
         cart.push({
-            ...product,
+            id, name, price, image,
             quantity: 1
         });
     }
@@ -259,6 +314,102 @@ function showNotification(message) {
     }, 3000);
 }
 
+// Render rating stars
+function renderRatingStars(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    
+    let stars = '';
+    
+    // Add full stars
+    for (let i = 0; i < fullStars; i++) {
+        stars += '<i class="fas fa-star"></i>';
+    }
+    
+    // Add half star if needed
+    if (hasHalfStar) {
+        stars += '<i class="fas fa-star-half-alt"></i>';
+    }
+    
+    // Add empty stars
+    for (let i = 0; i < emptyStars; i++) {
+        stars += '<i class="far fa-star"></i>';
+    }
+    
+    return stars;
+}
+
+// Setup search functionality
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        
+        if (searchTerm === '') {
+            displayProducts(products);
+            return;
+        }
+        
+        const filteredProducts = products.filter(product => 
+            product.name.toLowerCase().includes(searchTerm) ||
+            product.description.toLowerCase().includes(searchTerm) ||
+            product.category.toLowerCase().includes(searchTerm)
+        );
+        
+        displayProducts(filteredProducts);
+    });
+}
+
+// Setup category filters
+function setupCategoryFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Update active state
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            const category = button.dataset.category;
+            
+            if (category === 'all') {
+                displayProducts(products);
+            } else {
+                const filteredProducts = products.filter(
+                    product => product.category === category
+                );
+                displayProducts(filteredProducts);
+            }
+        });
+    });
+}
+
+// Show product detail
+function showProductDetail(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    // Update product detail content
+    document.getElementById('detailImage').src = product.image;
+    document.getElementById('detailTitle').textContent = product.name;
+    document.getElementById('detailPrice').textContent = `$${product.price.toFixed(2)}`;
+    document.getElementById('detailDescription').textContent = product.description;
+    document.getElementById('detailCategory').textContent = product.category.charAt(0).toUpperCase() + product.category.slice(1);
+    
+    // Update rating
+    const ratingContainer = document.querySelector('.product-rating .stars');
+    if (ratingContainer) {
+        ratingContainer.innerHTML = renderRatingStars(product.rating) + 
+            `<span class="review-count">(${product.reviews} reviews)</span>`;
+    }
+    
+    // Show the product detail modal
+    document.getElementById('productDetail').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
 // Setup event listeners
 function setupEventListeners() {
     // Mobile menu toggle
@@ -292,8 +443,73 @@ function setupEventListeners() {
     // Close cart when clicking on overlay
     overlay.addEventListener('click', () => {
         cartSidebar.classList.remove('active');
+        document.getElementById('productDetail').classList.remove('active');
         overlay.classList.remove('active');
         document.body.style.overflow = '';
+    });
+    
+    // Close product detail
+    document.querySelector('.close-detail')?.addEventListener('click', () => {
+        document.getElementById('productDetail').classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    
+    // Delegate events for dynamic elements
+    document.addEventListener('click', (e) => {
+        // Quick view button
+        if (e.target.closest('.quick-view')) {
+            const productId = parseInt(e.target.closest('.quick-view').dataset.id);
+            showProductDetail(productId);
+            overlay.classList.add('active');
+        }
+        
+        // Add to wishlist
+        if (e.target.closest('.add-to-wishlist')) {
+            const productId = parseInt(e.target.closest('.add-to-wishlist').dataset.id);
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                showNotification(`Added ${product.name} to wishlist`);
+                // Here you would typically add to a wishlist array
+            }
+        }
+        
+        // Add to cart from detail page
+        if (e.target.closest('.add-to-cart-detail')) {
+            const quantity = parseInt(document.querySelector('.quantity-input').value) || 1;
+            const productId = parseInt(document.querySelector('.product-detail').dataset.productId);
+            const product = products.find(p => p.id === productId);
+            
+            if (product) {
+                const existingItem = cart.find(item => item.id === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({
+                        ...product,
+                        quantity: quantity
+                    });
+                }
+                
+                updateCart();
+                showNotification(`${quantity} ${product.name}(s) added to cart!`);
+            }
+        }
+        
+        // Quantity controls in detail page
+        if (e.target.closest('.quantity-btn')) {
+            const input = document.querySelector('.quantity-input');
+            let value = parseInt(input.value) || 1;
+            
+            if (e.target.classList.contains('plus')) {
+                value++;
+            } else if (e.target.classList.contains('minus') && value > 1) {
+                value--;
+            }
+            
+            input.value = value;
+        }
     });
     
     // Close cart when pressing Escape key

@@ -43,9 +43,61 @@
 
     <!-- Products Section -->
     <section class="products" id="products">
-        <h2>Featured Products</h2>
+        <div class="products-header">
+            <h2>Our Products</h2>
+            <div class="products-controls">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search products...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="category-filters">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <button class="filter-btn" data-category="electronics">Electronics</button>
+                    <button class="filter-btn" data-category="fashion">Fashion</button>
+                    <button class="filter-btn" data-category="accessories">Accessories</button>
+                    <button class="filter-btn" data-category="fitness">Fitness</button>
+                </div>
+            </div>
+        </div>
         <div class="product-grid" id="productGrid">
             <!-- Products will be dynamically loaded here -->
+        </div>
+        <div class="product-detail" id="productDetail">
+            <div class="product-detail-content">
+                <button class="close-detail">&times;</button>
+                <div class="product-detail-main">
+                    <div class="product-detail-image">
+                        <img id="detailImage" src="" alt="Product Image">
+                    </div>
+                    <div class="product-detail-info">
+                        <h2 id="detailTitle"></h2>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <span class="review-count">(24 reviews)</span>
+                            </div>
+                        </div>
+                        <p class="product-price" id="detailPrice"></p>
+                        <p class="product-description" id="detailDescription"></p>
+                        <div class="product-actions">
+                            <div class="quantity-selector">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" value="1" min="1" class="quantity-input">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="add-to-cart-detail">Add to Cart</button>
+                        </div>
+                        <div class="product-meta">
+                            <p><span>Category:</span> <span id="detailCategory"></span></p>
+                            <p><span>Availability:</span> In Stock</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
